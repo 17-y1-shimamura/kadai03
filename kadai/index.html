@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>myMemoPad</title>
+<script src="js/jquery-2.1.3.min.js"></script>
+<link rel="stylesheet" href="css/sample.css">
+</head>
+<body>
+<header>
+<h1>メモ帳</h1>
+</header>
+<main>
+    <!-- 入力エリア -->
+    <div class="input__area">
+        <div class="task__title">メモの<br>タイトル</div>
+        <input type="text" id="key">
+    </div>
+    <div class="task">
+        <div class="task__title">メモの<br>内容</div>
+        <textarea id="memo"></textarea>
+    </div>
+
+    <!-- 保存、表示、全件消去ボタンエリア -->
+    <div class="btn_area">
+        <li id="save__btn">保存する</li>
+        <li id="load__btn">メモを全件表示する</li>
+        <li id="delete__btn">メモを全件消去する</li>
+    </div>
+
+    <!-- 検索エリア -->
+    <p>※タイトルで検索できます（※全部一致）</p>
+    <div class="search__area">
+        <div class="task__title">メモの<br>タイトル</div>
+        <input type="text" id="search__value">
+        <li id="search__btn">検索する</li>
+    </div>
+
+    <!-- 結果表示 -->
+    <table id="list">
+        </table>
+    </div>
+</main>
+
+<script>
+
+
+//1.セーブ クリックイベント
+$("#save__btn").on("click",function(){
+    const key = $("#key").val();
+    const value = $("#memo").val();
+    // もし何も入力されていなかったらアラート
+    if (key == "" && value == "") {
+        alert("何か入力してください。保存は完了していません。");
+    } else {
+        localStorage.setItem(key,value);
+        alert("保存しました。");
+    }
+});
+
+//2.ロード クリックイベント
+$("#load__btn").on("click",function(){
+    // 結果表示初期化
+    $("#list").empty();
+
+    // もしデータがない場合、内容がないことをアラート。
+    // もしデータがある場合、全件表示する
+    if(localStorage.length == 0){
+        alert('内容が保存されていません。');
+        $("#list").empty();
+    } else {
+        // データを読み込み
+        for(let i = 0; i < localStorage.length; i++){
+            const key   = localStorage.key(i);
+            const value = localStorage.getItem(key);
+            const html = `
+                <tr>
+                    <th>${key}</th>
+                    <td>${value}</td>
+                </tr>
+                `;
+                $("#list").append(html);
+        }
+    }
+});
+
+//3.デリート クリックイベント
+$("#delete__btn").on("click",function(){
+    localStorage.clear();
+    $("#list").empty();
+    alert("メモを全件消去しました。");
+});
+
+//4.サーチ クリックイベント
+$("#search__btn").on("click",function(){
+    $("#list").empty();
+    const search__value = $("#search__value").val();
+    if (search__value == "") {
+        alert("検索条件を入力してください。")
+    } else {
+        const search__result = localStorage.getItem(search__value);
+
+        if ( search__result == null) {
+            $("#list").empty();
+            alert("検索結果が見当たりませんでした。");
+        } else {
+            const html = `
+                <tr>
+                    <th>${search__value}</th>
+                    <td>${search__result}</td>
+                </tr>
+                `;
+                $("#list").append(html);
+        }  
+    }
+
+});
+</script>
+<footer><small></small></footer>
+</body>
+</html>
