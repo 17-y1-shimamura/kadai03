@@ -8,75 +8,176 @@
 </head>
 <body>
 <header>
-<h1>メモ帳</h1>
+<h1>簡単なタスク管理システム</h1>
 </header>
 <main>
+    <!--  -->
     <!-- 入力エリア -->
-    <div class="input__area">
-        <div class="task__title">メモの<br>タイトル</div>
-        <input type="text" id="key">
+    <div class="instructions">
+        <p>優先順位とタスクを入力して保存してください。</p>
     </div>
-    <div class="task">
-        <div class="task__title">メモの<br>内容</div>
-        <textarea id="memo"></textarea>
-    </div>
+    <table class="input__table">
+        <tr>
+            <th>タスクの優先順位</th>
+            <td>
+                <!-- タスクの優先順位はkey(key) -->
+                <select name="task__rank" id="key">
+                    <option value="重要度高">重要度高</option>
+                    <option value="重要度中">重要度中</option>
+                    <option value="重要度低">重要度低</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <!-- タスクの内容はvalue(memo) -->
+            <th>タスクの内容</th>
+            <td><textarea id="memo"></textarea></td>
+        </tr>
+    </table>
 
     <!-- 保存、表示、全件消去ボタンエリア -->
-    <div class="btn_area">
-        <li id="save__btn">保存する</li>
-        <li id="load__btn">メモを全件表示する</li>
-        <li id="delete__btn">メモを全件消去する</li>
+    <div class="btn__area">
+        <li id="save__btn">タスクを保存する</li>
+        <!-- <li id="load__btn">タスクを全件表示する</li> -->
+        <li id="delete__btn">タスクを全件消去する</li>
     </div>
 
     <!-- 検索エリア -->
-    <p>※タイトルで検索できます（※全部一致）</p>
-    <div class="search__area">
-        <div class="task__title">メモの<br>タイトル</div>
-        <input type="text" id="search__value">
+    <p>※優先順位で検索できます。優先順位を選択して検索ボタンを押してください。</p>
+    <table class="search__table">
+        <tr>
+            <th>タスクの優先順位</th>
+            <td>
+                <select name="task__rank" id="search">
+                    <option value="全選択">全選択    
+                    </option>
+                    <option value="重要度高">重要度高</option>
+                    <option value="重要度中">重要度中</option>
+                    <option value="重要度低">重要度低</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div class="btn__area">
         <li id="search__btn">検索する</li>
     </div>
+    
 
     <!-- 結果表示 -->
-    <table id="list">
+    <div class="search__btn">
+        <table id="list">
+            <tr>
+                <th>重要度</th>
+                <th>タスクの内容</th>
+            </tr>
         </table>
     </div>
+    
 </main>
 
 <script>
 
 
-//1.セーブ クリックイベント
+//1.保存ボタン クリックイベント
+// タスクの内容を保持する配列
+let array1 = []; // 重要度高
+let array2 = []; // 重要度中
+let array3 = []; // 重要度低
 $("#save__btn").on("click",function(){
     const key = $("#key").val();
     const value = $("#memo").val();
-    // もし何も入力されていなかったらアラート
-    if (key == "" && value == "") {
-        alert("何か入力してください。保存は完了していません。");
+
+    if (key == "" || value == "") {
+        // もし何も入力されていなかったらアラート
+        alert("タスクの内容に何か入力してください。保存は完了していません。");
     } else {
-        localStorage.setItem(key,value);
-        alert("保存しました。");
+        // 優先順位ごとにタスクの内容を配列として保持
+        switch (key){
+            case "重要度高":
+                array1.push(value);
+                console.log(array1); 
+                // 配列をJSON形式に変換してからローカルストレージに保存
+                localStorage.setItem(key, JSON.stringify(array1));
+                alert("保存が完了しました。")
+                break;
+
+            case "重要度中":
+                array2.push(value);
+                console.log(array2); 
+                // 配列をJSON形式に変換してからローカルストレージに保存
+                localStorage.setItem(key, JSON.stringify(array2));
+                alert("保存が完了しました。")
+                break;
+
+            case "重要度低":
+                array3.push(value);
+                console.log(array3); 
+                // 配列をJSON形式に変換してからローカルストレージに保存
+                localStorage.setItem(key, JSON.stringify(array3));
+                alert("保存が完了しました。")
+                break;
+        }
     }
 });
 
-//2.ロード クリックイベント
-$("#load__btn").on("click",function(){
-    // 結果表示初期化
+//2.検索ボタン クリックイベント
+$("#search__btn").on("click",function(){
+    
+    // 結果表示画面を初期化
     $("#list").empty();
-
-    // もしデータがない場合、内容がないことをアラート。
-    // もしデータがある場合、全件表示する
-    if(localStorage.length == 0){
-        alert('内容が保存されていません。');
-        $("#list").empty();
-    } else {
-        // データを読み込み
-        for(let i = 0; i < localStorage.length; i++){
-            const key   = localStorage.key(i);
-            const value = localStorage.getItem(key);
-            const html = `
+    const html = `
                 <tr>
-                    <th>${key}</th>
-                    <td>${value}</td>
+                    <th>重要度</th>
+                    <th>タスクの内容</th>
+                </tr>
+                `;
+    $("#list").append(html);
+    
+    // 入力値を取得
+    const key = $("#search").val();
+    data = JSON.parse(localStorage.getItem(key));
+
+    if (key == "全選択") {
+        // 入力値が全選択の場合
+        result1 = JSON.parse(localStorage.getItem("重要度高"));
+        result2 = JSON.parse(localStorage.getItem("重要度中"));
+        result3 = JSON.parse(localStorage.getItem("重要度低"));
+        for(let i = 0; i < result1.length; i++){
+        const html = `
+                <tr>
+                    <td>${"重要度高"}</td>
+                    <td>${result1[i]}</td>
+                </tr>
+                `;
+                $("#list").append(html);
+        }
+        for(let i = 0; i < result2.length; i++){
+        const html = `
+                <tr>
+                    <td>${"重要度中"}</td>
+                    <td>${result2[i]}</td>
+                </tr>
+                `;
+                $("#list").append(html);
+        }
+        for(let i = 0; i < array3.length; i++){
+        const html = `
+                <tr>
+                    <td>${"重要度低"}</td>
+                    <td>${result3[i]}</td>
+                </tr>
+                `;
+                $("#list").append(html);
+        }
+    } else if (data == null) {
+        alert("データがありません。")
+    } else {
+        // データがある場合は条件に一致したもののみ表示       
+        for(let i = 0; i < data.length; i++){
+        const html = `
+                <tr>
+                    <td>${key}</td>
+                    <td>${data[i]}</td>
                 </tr>
                 `;
                 $("#list").append(html);
@@ -88,33 +189,32 @@ $("#load__btn").on("click",function(){
 $("#delete__btn").on("click",function(){
     localStorage.clear();
     $("#list").empty();
-    alert("メモを全件消去しました。");
+    alert("タスクを全件消去しました。");
 });
 
 //4.サーチ クリックイベント
-$("#search__btn").on("click",function(){
-    $("#list").empty();
-    const search__value = $("#search__value").val();
-    if (search__value == "") {
-        alert("検索条件を入力してください。")
-    } else {
-        const search__result = localStorage.getItem(search__value);
+// $("#search__btn").on("click",function(){
+//     $("#list").empty();
+//     const search__value = $("#search__value").val();
+//     if (search__value == "") {
+//         alert("検索条件を入力してください。")
+//     } else {
+//         const search__result = localStorage.getItem(search__value);
 
-        if ( search__result == null) {
-            $("#list").empty();
-            alert("検索結果が見当たりませんでした。");
-        } else {
-            const html = `
-                <tr>
-                    <th>${search__value}</th>
-                    <td>${search__result}</td>
-                </tr>
-                `;
-                $("#list").append(html);
-        }  
-    }
-
-});
+//         if ( search__result == null) {
+//             $("#list").empty();
+//             alert("検索結果が見当たりませんでした。");
+//         } else {
+//             const html = `
+//                 <tr>
+//                     <th>${search__value}</th>
+//                     <td>${search__result}</td>
+//                 </tr>
+//                 `;
+//                 $("#list").append(html);
+//         }  
+//     }
+// });
 </script>
 <footer><small></small></footer>
 </body>
