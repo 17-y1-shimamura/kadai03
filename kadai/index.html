@@ -142,33 +142,39 @@ $("#search__btn").on("click",function(){
         result1 = JSON.parse(localStorage.getItem("重要度高"));
         result2 = JSON.parse(localStorage.getItem("重要度中"));
         result3 = JSON.parse(localStorage.getItem("重要度低"));
-        for(let i = 0; i < result1.length; i++){
-        const html = `
+
+        if (result1 == null && result2 == null && result3 == null) {
+            alert("データがありません。")
+        } else {
+            for(let i = 0; i < result1.length; i++){
+                const html = `
                 <tr>
                     <td>${"重要度高"}</td>
                     <td>${result1[i]}</td>
                 </tr>
                 `;
                 $("#list").append(html);
-        }
-        for(let i = 0; i < result2.length; i++){
-        const html = `
+            }
+            for(let i = 0; i < result2.length; i++){
+                const html = `
                 <tr>
                     <td>${"重要度中"}</td>
                     <td>${result2[i]}</td>
                 </tr>
                 `;
                 $("#list").append(html);
-        }
-        for(let i = 0; i < array3.length; i++){
-        const html = `
+            }
+            for(let i = 0; i < result3.length; i++){
+                const html = `
                 <tr>
                     <td>${"重要度低"}</td>
                     <td>${result3[i]}</td>
                 </tr>
                 `;
                 $("#list").append(html);
+            }
         }
+        
     } else if (data == null) {
         alert("データがありません。")
     } else {
